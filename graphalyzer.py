@@ -33,7 +33,7 @@ def main():
     graph = nx.Graph()
 
     # Always holds the previous word seen
-    previous_word = ''
+    previous_word = ""
 
     line = input.readline()
     while (line != ""):
@@ -57,19 +57,21 @@ def main():
 
             graph.add_node(word)
 
-            # Add an edge between our current word and our
-            # previous word
-            graph.add_edge(previous_word, word)
+            if (previous_word != ""):
+                # Add an edge between our current word and our
+                # previous word
+                graph.add_edge(previous_word, word)
+    
+                # Get current bigram count
+                # Default value returned is 0 if it does not exist
+                curr_count = graph[previous_word][word].get('count', 0) 
 
-            # Get current bigram count
-            # Default value returned is 0 if it does not exist
-            curr_count = graph[previous_word][word].get('count', 0) 
+                # Increment Count
+                curr_count = curr_count + 1
 
-            # Increment Count
-            curr_count = curr_count + 1
-
-            # Reset bigram count
-            graph[previous_word][word]['count'] = curr_count
+                # Reset bigram count
+                graph[previous_word][word]['count'] = curr_count
+            # End if
 
             # Now that we no longer need the previous_word
             # set the current word to the previous word
