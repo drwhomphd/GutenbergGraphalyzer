@@ -48,8 +48,6 @@ def main():
             # Skip the empties. 
             if  (word == ""):
                 continue
-           
-            print word
 
             # Convert to lowercase
             word = word.lower()
