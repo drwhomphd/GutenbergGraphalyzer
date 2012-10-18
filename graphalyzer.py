@@ -44,9 +44,12 @@ def main():
         # Loop through each word
         for word in word_list:
 
+
             # Skip the empties. 
-            if  (word == ''):
+            if  (word == ""):
                 continue
+           
+            print word
 
             # Convert to lowercase
             word = word.lower()
