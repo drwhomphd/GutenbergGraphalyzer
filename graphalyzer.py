@@ -78,13 +78,13 @@ def main():
     
                 # Get current bigram count
                 # Default value returned is 0 if it does not exist
-                curr_count = graph[previous_word][word].get('count', 0) 
+                curr_count = graph[previous_word][word].get('weight', 0) 
 
                 # Increment Count
                 curr_count = curr_count + 1
 
                 # Reset bigram count
-                graph[previous_word][word]['count'] = curr_count
+                graph[previous_word][word]['weight'] = curr_count
             # End if
 
             # Now that we no longer need the previous_word
@@ -101,6 +101,12 @@ def main():
 
         line = input.readline()
     #END WHILE
+
+    # Print out a few metrics
+    print("Degree Assortativity: " + str(nx.degree_assortativity_coefficient(graph)))
+    print("Average Clustering Coefficient: " + str(nx.average_clustering(graph)))
+    # This measure is taking a LONG time to calculate. Leaving out for now.
+    #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
 
     # Export the graph
     nx.write_pajek(graph, GRAPH_FILE)
