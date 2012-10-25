@@ -17,6 +17,8 @@
 import re
 import networkx as nx
 import argparse
+from nltk.tokenize import *
+import nltk
 
 def main():
 
@@ -57,11 +59,81 @@ def main():
         nx.write_dot(graph, GRAPH_FILE + ".dot")
 #END main
 
+def is_ascii(word):
+    check_val = True
+    try:
+        word.decode('ascii')
+    except UnicodeDecodeError:
+        check_val = False
+    
+    return check_val
+# END is_ascii
+
 def nltk_parse(input_file):
     # Open lit file...
     input = open(input_file, 'r')
     word_graph = nx.Graph()
    
+    # Make sure the nltk related files are downloaded
+    nltk.download("punkt")
+    
+    # Collected count of each word
+    word_dictionary = {}
+
+    total_words = 0
+    
+    # Always holds the previous word seene
+    previous_word = ""
+   
+    lines = input.read()
+
+    # Tokenizing Sentences
+    sentences = sent_tokenize(lines)
+    for sentence in sentences:
+
+        # Split the line in to individual words
+        word_list = word_tokenize(sentence) 
+
+        # Loop through each word
+        for word in word_list:
+
+            # Convert to lowercase
+            word = word.lower()
+            
+            if is_ascii(word):
+                word_graph.add_node(word)
+
+                if (previous_word != ""):
+                    # Add an edge between our current word and our
+                    # previous word
+                    word_graph.add_edge(previous_word, word)
+        
+                    # Get current bigram count
+                    # Default value returned is 0 if it does not exist
+                    curr_count = word_graph[previous_word][word].get('weight', 0) 
+
+                    # Increment Count
+                    curr_count = curr_count + 1
+
+                    # Reset bigram count
+                    word_graph[previous_word][word]['weight'] = curr_count
+                # End if
+
+                # Now that we no longer need the previous_word
+                # set the current word to the previous word
+                previous_word = word
+
+                total_words = total_words + 1
+            #END if
+
+            # Dictionary output will be done later
+            # Is word in dictionary yet?
+                # Yes? Increment Count
+                # No? Set Count to 1
+        # END FOR
+
+    #END FOR
+
 
     input.close()
     return word_graph
@@ -76,7 +148,6 @@ def regexp_parse(input_file):
 
     # Word count of the text
     total_words = 0
-
 
     # Always holds the previous word seen
     previous_word = ""
