@@ -27,16 +27,49 @@ def main():
             default="test.txt")
     parser.add_argument('-g', '--graph',
             dest="GRAPH_FILE",
-            default="test",
+            default=False,
             help="Filename to save the GraphViz Graph to. Automatically appends .dot")
+    parser.add_argument('-n', '--nltk',
+            dest="NLTK",
+            default=False,
+            action="store_true")
     args = parser.parse_args()
     INPUT_FILE = args.INPUT_FILE
     GRAPH_FILE = args.GRAPH_FILE
+    NLTK = args.NLTK
 
+    graph = None
 
+    if(NLTK):
+        graph = nltk_parse(INPUT_FILE)
+    else:
+        graph = regexp_parse(INPUT_FILE)
+    #END if
 
+    # Print out a few metrics
+    print("Degree Assortativity: " + str(nx.degree_assortativity_coefficient(graph)))
+    print("Average Clustering Coefficient: " + str(nx.average_clustering(graph)))
+    # This measure is taking a LONG time to calculate. Leaving out for now.
+    #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
+
+    # Export the graph
+    if(GRAPH_FILE):
+        nx.write_dot(graph, GRAPH_FILE + ".dot")
+#END main
+
+def nltk_parse(input_file):
     # Open lit file...
-    input = open(INPUT_FILE, 'r')
+    input = open(input_file, 'r')
+    word_graph = nx.Graph()
+   
+
+    input.close()
+    return word_graph
+
+def regexp_parse(input_file):
+    # Open lit file...
+    input = open(input_file, 'r')
+    word_graph = nx.Graph()
 
     # Collected count of each word
     word_dictionary = {}
@@ -44,7 +77,6 @@ def main():
     # Word count of the text
     total_words = 0
 
-    graph = nx.Graph()
 
     # Always holds the previous word seen
     previous_word = ""
@@ -69,22 +101,22 @@ def main():
             # Remove underline marks '_'
             word = word.strip('_')
 
-            graph.add_node(word)
+            word_graph.add_node(word)
 
             if (previous_word != ""):
                 # Add an edge between our current word and our
                 # previous word
-                graph.add_edge(previous_word, word)
+                word_graph.add_edge(previous_word, word)
     
                 # Get current bigram count
                 # Default value returned is 0 if it does not exist
-                curr_count = graph[previous_word][word].get('weight', 0) 
+                curr_count = word_graph[previous_word][word].get('weight', 0) 
 
                 # Increment Count
                 curr_count = curr_count + 1
 
                 # Reset bigram count
-                graph[previous_word][word]['weight'] = curr_count
+                word_graph[previous_word][word]['weight'] = curr_count
             # End if
 
             # Now that we no longer need the previous_word
@@ -102,16 +134,9 @@ def main():
         line = input.readline()
     #END WHILE
 
-    # Print out a few metrics
-    print("Degree Assortativity: " + str(nx.degree_assortativity_coefficient(graph)))
-    print("Average Clustering Coefficient: " + str(nx.average_clustering(graph)))
-    # This measure is taking a LONG time to calculate. Leaving out for now.
-    #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
+    input.close()
 
-    # Export the graph
-    nx.write_dot(graph, GRAPH_FILE + ".dot")
-#END main
-
+    return word_graph
 
 if __name__ == "__main__":
     main();
