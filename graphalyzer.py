@@ -34,29 +34,47 @@ def main():
     parser.add_argument('-n', '--nltk',
             dest="NLTK",
             default=False,
-            action="store_true")
+            action="store_true"
+            help="Disable Regexp parsing and enable NLTK parsing.")
+    parser.add_argument('-d', '--dir',
+            dest="DIR",
+            help="Provide a directory of text files to parse instead of an individual file.")            
+
     args = parser.parse_args()
     INPUT_FILE = args.INPUT_FILE
     GRAPH_FILE = args.GRAPH_FILE
     NLTK = args.NLTK
+    DIR = args.NLTK
+
+    # The DIR and INPUT_FILE option cannot both be set
+    if(DIR and INPUT_FILE):
+        print("DIR and INPUT_FILE option are mutually exclusive.")
+        sys.exit(-1)
 
     graph = None
 
-    if(NLTK):
-        graph = nltk_parse(INPUT_FILE)
-    else:
-        graph = regexp_parse(INPUT_FILE)
+    if(INPUT_FILE):
+        if(NLTK):
+            graph = nltk_parse(INPUT_FILE)
+        else:
+            graph = regexp_parse(INPUT_FILE)
+        #END if
+
+        # Print out a few metrics
+        print("Degree Assortativity: " + str(nx.degree_assortativity_coefficient(graph)))
+        print("Average Clustering Coefficient: " + str(nx.average_clustering(graph)))
+        # This measure is taking a LONG time to calculate. Leaving out for now.
+        #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
+
+        # Export the graph
+        if(GRAPH_FILE):
+            nx.write_dot(graph, GRAPH_FILE + ".dot")
+        #END if
     #END if
 
-    # Print out a few metrics
-    print("Degree Assortativity: " + str(nx.degree_assortativity_coefficient(graph)))
-    print("Average Clustering Coefficient: " + str(nx.average_clustering(graph)))
-    # This measure is taking a LONG time to calculate. Leaving out for now.
-    #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
-
-    # Export the graph
-    if(GRAPH_FILE):
-        nx.write_dot(graph, GRAPH_FILE + ".dot")
+    if(DIR):
+        return
+    #END IF
 #END main
 
 def is_ascii(word):
