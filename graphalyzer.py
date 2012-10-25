@@ -27,8 +27,8 @@ def main():
             default="test.txt")
     parser.add_argument('-g', '--graph',
             dest="GRAPH_FILE",
-            default="test.net",
-            help="Filename to save the Pajek Graph to.")
+            default="test",
+            help="Filename to save the GraphViz Graph to. Automatically appends .dot")
     args = parser.parse_args()
     INPUT_FILE = args.INPUT_FILE
     GRAPH_FILE = args.GRAPH_FILE
@@ -109,7 +109,7 @@ def main():
     #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
 
     # Export the graph
-    nx.write_pajek(graph, GRAPH_FILE)
+    nx.write_dot(graph, GRAPH_FILE + ".dot")
 #END main
 
 
