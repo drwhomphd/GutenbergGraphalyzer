@@ -14,6 +14,8 @@
      You should have received a copy of the GNU General Public License
      along with Gutenberg Graphalyzer.  If not, see <http://www.gnu.org/licenses/>.
 """
+from nltk.tokenize import *
+import nltk
 import re
 import networkx as nx
 import argparse
@@ -73,24 +75,146 @@ def main():
             default="test.txt")
     parser.add_argument('-g', '--graph',
             dest="GRAPH_FILE",
-            default="test",
+            default=False,
             help="Filename to save the GraphViz Graph to. Automatically appends .dot")
+    parser.add_argument('-n', '--nltk',
+            dest="NLTK",
+            default=False,
+            action="store_true",
+            help="Disable Regexp parsing and enable NLTK parsing.")
+    parser.add_argument('-d', '--dir',
+            dest="DIR",
+            help="Provide a directory of text files to parse instead of an individual file.")            
+
     args = parser.parse_args()
     INPUT_FILE = args.INPUT_FILE
     GRAPH_FILE = args.GRAPH_FILE
+    NLTK = args.NLTK
+    DIR = args.NLTK
 
+    # The DIR and INPUT_FILE option cannot both be set
+    if(DIR and INPUT_FILE):
+        print("DIR and INPUT_FILE option are mutually exclusive.")
+        sys.exit(-1)
 
+    graph = None
 
+    if(INPUT_FILE):
+        if(NLTK):
+            graph = nltk_parse(INPUT_FILE)
+        else:
+            graph = regexp_parse(INPUT_FILE)
+        #END if
+
+        # Print out a few metrics
+        print("Degree Assortativity: " + str(nx.degree_assortativity_coefficient(graph)))
+        print("Average Clustering Coefficient: " + str(nx.average_clustering(graph)))
+        print(vector_degree_mag_info(graph))
+        # This measure is taking a LONG time to calculate. Leaving out for now.
+        #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
+
+        #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
+
+        # Export the graph
+        if(GRAPH_FILE):
+            nx.write_dot(graph, GRAPH_FILE + ".dot")
+        #END if
+    #END if
+
+    if(DIR):
+        return
+    #END IF
+#END main
+
+def is_ascii(word):
+    check_val = True
+    try:
+        word.decode('ascii')
+    except UnicodeDecodeError:
+        check_val = False
+    
+    return check_val
+# END is_ascii
+
+def nltk_parse(input_file):
     # Open lit file...
-    input = open(INPUT_FILE, 'r')
+    input = open(input_file, 'r')
+    word_graph = nx.Graph()
+   
+    # Make sure the nltk related files are downloaded
+    nltk.download("punkt")
+    
+    # Collected count of each word
+    word_dictionary = {}
+
+    total_words = 0
+    
+    # Always holds the previous word seene
+    previous_word = ""
+   
+    lines = input.read()
+
+    # Tokenizing Sentences
+    sentences = sent_tokenize(lines)
+    for sentence in sentences:
+
+        # Split the line in to individual words
+        word_list = word_tokenize(sentence) 
+
+        # Loop through each word
+        for word in word_list:
+
+            # Convert to lowercase
+            word = word.lower()
+            
+            if is_ascii(word):
+                word_graph.add_node(word)
+
+                if (previous_word != ""):
+                    # Add an edge between our current word and our
+                    # previous word
+                    word_graph.add_edge(previous_word, word)
+        
+                    # Get current bigram count
+                    # Default value returned is 0 if it does not exist
+                    curr_count = word_graph[previous_word][word].get('weight', 0) 
+
+                    # Increment Count
+                    curr_count = curr_count + 1
+
+                    # Reset bigram count
+                    word_graph[previous_word][word]['weight'] = curr_count
+                # End if
+
+                # Now that we no longer need the previous_word
+                # set the current word to the previous word
+                previous_word = word
+
+                total_words = total_words + 1
+            #END if
+
+            # Dictionary output will be done later
+            # Is word in dictionary yet?
+                # Yes? Increment Count
+                # No? Set Count to 1
+        # END FOR
+
+    #END FOR
+
+
+    input.close()
+    return word_graph
+
+def regexp_parse(input_file):
+    # Open lit file...
+    input = open(input_file, 'r')
+    word_graph = nx.Graph()
 
     # Collected count of each word
     word_dictionary = {}
 
     # Word count of the text
     total_words = 0
-
-    graph = nx.Graph()
 
     # Always holds the previous word seen
     previous_word = ""
@@ -115,22 +239,22 @@ def main():
             # Remove underline marks '_'
             word = word.strip('_')
 
-            graph.add_node(word)
+            word_graph.add_node(word)
 
             if (previous_word != ""):
                 # Add an edge between our current word and our
                 # previous word
-                graph.add_edge(previous_word, word)
+                word_graph.add_edge(previous_word, word)
     
                 # Get current bigram count
                 # Default value returned is 0 if it does not exist
-                curr_count = graph[previous_word][word].get('weight', 0) 
+                curr_count = word_graph[previous_word][word].get('weight', 0) 
 
                 # Increment Count
                 curr_count = curr_count + 1
 
                 # Reset bigram count
-                graph[previous_word][word]['weight'] = curr_count
+                word_graph[previous_word][word]['weight'] = curr_count
             # End if
 
             # Now that we no longer need the previous_word
@@ -148,18 +272,9 @@ def main():
         line = input.readline()
     #END WHILE
 
-    # Print out a few metrics
-    print("Degree Assortativity: " + str(nx.degree_assortativity_coefficient(graph)))
-    print("Average Clustering Coefficient: " + str(nx.average_clustering(graph)))
-    print(vector_degree_mag_info(graph))
-    # This measure is taking a LONG time to calculate. Leaving out for now.
-    #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
-
-
-
-    # Export the graph
-    nx.write_dot(graph, GRAPH_FILE + ".dot")
-#END main
+    input.close()
+    return word_graph
+# End regexp_parse
 
 
 if __name__ == "__main__":
