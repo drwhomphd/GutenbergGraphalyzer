@@ -17,6 +17,52 @@
 import re
 import networkx as nx
 import argparse
+import math
+
+
+"""
+Vertex degree magnitude-based information content algorith.
+
+Implemented based on Bonchev and Buck's "Quantitative measure of network complexity" paper.
+
+I_{vd} = \sum{V}{i=1}{a_i log_2 a_i}
+
+
+"""
+def vector_degree_mag_info(graph):
+
+    information_content = 0.0
+
+    for n in graph.nodes():
+        degree = graph.degree(n)
+
+        information_content = information_content + (degree * (math.log(degree,2)))
+    #END for
+
+
+    return information_content
+
+#End vertex_degree_mag_info
+
+
+"""
+The shannon entropy contained in a graph.
+
+Implemented based on Bonchev and Buck's "Quantitative measure of network complexity" paper.
+Specifically equation 15.
+
+H(W) = W log_2 W - \sum{V}{i=1}{w_i log_2 w_i}
+
+W is the sum of all edge weights.
+w_i is the sum of 
+
+"""
+def shannon_graph_entropy(graph):
+
+    information_content = 0.0
+    return information_content
+
+#End shannon_graph_entropy
 
 def main():
 
@@ -105,8 +151,11 @@ def main():
     # Print out a few metrics
     print("Degree Assortativity: " + str(nx.degree_assortativity_coefficient(graph)))
     print("Average Clustering Coefficient: " + str(nx.average_clustering(graph)))
+    print(vector_degree_mag_info(graph))
     # This measure is taking a LONG time to calculate. Leaving out for now.
     #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
+
+
 
     # Export the graph
     nx.write_dot(graph, GRAPH_FILE + ".dot")
