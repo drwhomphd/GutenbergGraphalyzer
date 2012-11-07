@@ -20,7 +20,7 @@ import re
 import networkx as nx
 import argparse
 import math
-
+import sys
 
 """
 Vertex degree magnitude-based information content algorith.
@@ -90,7 +90,7 @@ def main():
     INPUT_FILE = args.INPUT_FILE
     GRAPH_FILE = args.GRAPH_FILE
     NLTK = args.NLTK
-    DIR = args.NLTK
+    DIR = args.DIR
 
     # The DIR and INPUT_FILE option cannot both be set
     if(DIR and INPUT_FILE):
@@ -167,6 +167,18 @@ def nltk_parse(input_file):
             # Convert to lowercase
             word = word.lower()
             
+            # Strip out _ characters used for bolding...
+            word = word.strip('_')
+           
+            """
+                The \W+$ regexp will match all punctuation only word tokens.
+                The \W+ regexp will match word tokens that also include apsotraphe's for shortening.
+
+                A research assumption should be what to do with conjunctions... best to leave them in.
+            """
+            if(re.match("\W+$", word) != None):
+                print word
+
             if is_ascii(word):
                 word_graph.add_node(word)
 
