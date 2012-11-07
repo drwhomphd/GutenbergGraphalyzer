@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from __future__ import division
 """
      This file is part of Gutenberg Graphalyzer
      Gutenberg Graphalyzer is free software: you can redistribute it and/or modify
@@ -21,6 +22,28 @@ import networkx as nx
 import argparse
 import math
 import sys
+
+"""
+Normalized Edge Complexity
+
+Conn = \frac{A}{V^2} = \frac{E_g}{V^2} = E_n
+
+Redefines A = E = E_g = # of edges. This is different than traditional values of A in undirected graphs as
+A is usually normalized to 2E (as undirected graph edges are shorthand for 1 input edge and 1 output edge).
+
+Implemented based on Bonchev and Buck's "Quantitative measure of network complexity" paper.
+"""
+def normalized_edge_complexity(graph):
+
+    if(graph.number_of_selfloops() > 0):
+        return graph.number_of_edges() / (graph.number_of_nodes() * graph.number_of_nodes())
+
+    else:
+        return graph.number_of_edges() / (graph.number_of_nodes() * (graph.number_of_nodes() - 1.0))
+    #END if
+
+#End normalized_edge_complexity
+
 
 """
 Vertex degree magnitude-based information content algorith.
@@ -153,6 +176,8 @@ def print_metrics(graph):
         print("Ivd:" + str(vector_degree_mag_info(graph)))
         # Shannon Graph Information based on edge weights, i.e., bigram counts
         print("SI:" + str(shannon_graph_entropy(graph)))
+        # Normalized Edge Complexity
+        print("NEC:" + str(normalized_edge_complexity(graph)))
 
         # This measure is taking a LONG time to calculate. Leaving out for now.
         #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
