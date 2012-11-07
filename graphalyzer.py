@@ -147,6 +147,15 @@ def nltk_parse(input_file):
     # Collected count of each word
     word_dictionary = {}
 
+    """
+        The \W+$ regexp will match all punctuation only word tokens.
+        The \W+ regexp will match word tokens that also include apsotraphe's for shortening.
+
+        A research assumption should be what to do with conjunctions... best to leave them in.
+    """
+    # Compile the regexp we use to detect punctuation
+    punc_regexp = re.compile("\W+$")
+
     total_words = 0
     
     # Always holds the previous word seene
@@ -169,15 +178,10 @@ def nltk_parse(input_file):
             
             # Strip out _ characters used for bolding...
             word = word.strip('_')
-           
-            """
-                The \W+$ regexp will match all punctuation only word tokens.
-                The \W+ regexp will match word tokens that also include apsotraphe's for shortening.
-
-                A research assumption should be what to do with conjunctions... best to leave them in.
-            """
-            if(re.match("\W+$", word) != None):
-                print word
+          
+            # Skip tokens that are just punctuation characters.
+            if(re.match(punc_regexp, word) != None):
+                continue
 
             if is_ascii(word):
                 word_graph.add_node(word)
