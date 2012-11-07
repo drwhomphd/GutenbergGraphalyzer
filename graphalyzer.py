@@ -24,6 +24,21 @@ import math
 import sys
 
 """
+Average Edge Complexity
+< a_i > = \frac{A}{V} = \frac{E_g}{V} = E_a
+
+Redefines A = E = E_g = # of edges. This is different than traditional values of A in undirected graphs as
+A is usually normalized to 2E (as undirected graph edges are shorthand for 1 input edge and 1 output edge).
+
+Implemented based on Bonchev and Buck's "Quantitative measure of network complexity" paper.
+"""
+def average_edge_complexity(graph):
+
+    return graph.number_of_edges() / graph.number_of_nodes()
+
+#END average_edge_complexity
+
+"""
 Normalized Edge Complexity
 
 Conn = \frac{A}{V^2} = \frac{E_g}{V^2} = E_n
@@ -178,6 +193,8 @@ def print_metrics(graph):
         print("SI:" + str(shannon_graph_entropy(graph)))
         # Normalized Edge Complexity
         print("NEC:" + str(normalized_edge_complexity(graph)))
+        # Average Edge Complexity
+        print("AEC:" + str(average_edge_complexity(graph)))
 
         # This measure is taking a LONG time to calculate. Leaving out for now.
         #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
