@@ -56,12 +56,36 @@ Specifically equation 15.
 H(W) = W log_2 W - \sum{V}{i=1}{w_i log_2 w_i}
 
 W is the sum of all edge weights.
-w_i is the sum of 
+w_i is the sum of each node's edge weights.
+
+In the case of these graphs, the "weight" of an edge is he bigram count.
 
 """
 def shannon_graph_entropy(graph):
 
     information_content = 0.0
+    total_edge_weight = 0.0
+
+    # Loop through each node
+    for n in graph.nodes():
+        
+        node_weight = 0.0
+
+        # Add up edge weights for each node
+        for n0, n1, edata in graph.edges_iter(n, data=True):
+
+            node_weight = node_weight + edata['weight']
+            
+            # Continue calculating the total edge weight for H_max
+            total_edge_weight = total_edge_weight + edata['weight']
+        #END for
+
+        information_content = information_content + (node_weight * math.log(node_weight,2))
+        
+    #END for
+
+    information_content = (total_edge_weight * math.log(total_edge_weight,2)) - information_content
+
     return information_content
 
 #End shannon_graph_entropy
@@ -106,14 +130,7 @@ def main():
             graph = regexp_parse(INPUT_FILE)
         #END if
 
-        # Print out a few metrics
-        print("Degree Assortativity: " + str(nx.degree_assortativity_coefficient(graph)))
-        print("Average Clustering Coefficient: " + str(nx.average_clustering(graph)))
-        print(vector_degree_mag_info(graph))
-        # This measure is taking a LONG time to calculate. Leaving out for now.
-        #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
-
-        #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
+        print_metrics(graph)
 
         # Export the graph
         if(GRAPH_FILE):
@@ -125,6 +142,21 @@ def main():
         return
     #END IF
 #END main
+def print_metrics(graph):
+        # Print out a few metrics
+        
+        # Degree assortativity
+        print("DA:" + str(nx.degree_assortativity_coefficient(graph)))
+        # Average Clustering Coefficient
+        print("ACC:" + str(nx.average_clustering(graph)))
+        # Information content of vector degree magnitudes
+        print("Ivd:" + str(vector_degree_mag_info(graph)))
+        # Shannon Graph Information based on edge weights, i.e., bigram counts
+        print("SI:" + str(shannon_graph_entropy(graph)))
+
+        # This measure is taking a LONG time to calculate. Leaving out for now.
+        #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
+#END print_metrics
 
 def is_ascii(word):
     check_val = True
