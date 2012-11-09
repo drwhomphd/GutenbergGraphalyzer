@@ -128,15 +128,37 @@ def shannon_graph_entropy(graph):
 
 #End shannon_graph_entropy
 
+
+"""
+Calcualtes the Average number of out_edges for the graph.
+
+\sum{i=1}{V}{a_i} / V
+"""
 def average_adjacency(graph):
     adj = 0.0
 
     for n in graph.nodes_iter():
-        adj = adj + n.out_degree(n)
+        adj = adj + graph.out_degree(n)
     #END For
 
     return adj / graph.number_of_nodes()
 #END average_adjacency
+
+"""
+Calculates the distance degree of a specific node. The Distance degree is the 
+sum of the node's shortest paths to all other nodes in the graph.
+"""
+def distance_degree(graph, node):
+    
+    dist_degree = 0.0
+
+    for n in graph.nodes_iter():
+        dist_degree = dist_degree + nx.shortest_path(graph, source=node, target=n)
+    #END for
+
+    return dist_degree
+#END distance_degree
+
 
 def main():
 
