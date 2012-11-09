@@ -211,8 +211,10 @@ def print_metrics(graph):
         print("NEC:" + str(normalized_edge_complexity(graph)))
         # Average Edge Complexity
         print("AEC:" + str(average_edge_complexity(graph)))
-        # <A_i> / <D_i> = A / D
+        # Average Shortest Path
         print("ASP:" + str(nx.average_shortest_path_length(graph)))
+        # <A_i> / <D_i> = A / D
+        print("AD:" + str(average_adjacency(graph) / average_distance))
 #END print_metrics
 
 def is_ascii(word):
