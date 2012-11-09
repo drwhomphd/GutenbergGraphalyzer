@@ -188,16 +188,20 @@ def print_metrics(graph):
         # Average Clustering Coefficient
         print("ACC:" + str(nx.average_clustering(graph)))
         # Information content of vector degree magnitudes
-        print("Ivd:" + str(vector_degree_mag_info(graph)))
+        ivd = vector_degree_mag_info(graph)
+        print("Ivd:" + str(ivd))
+        # Normalized Ivd over the number of nodes in the graph
+        print("Ivdnorm:" + str((ivd/graph.number_of_nodes())))
         # Shannon Graph Information based on edge weights, i.e., bigram counts
-        print("SI:" + str(shannon_graph_entropy(graph)))
+        si = shannon_graph_entropy(graph)
+        print("SI:" + str(si))
+        print("SInorm:" + str(si / graph.number_of_nodes()))
         # Normalized Edge Complexity
         print("NEC:" + str(normalized_edge_complexity(graph)))
         # Average Edge Complexity
         print("AEC:" + str(average_edge_complexity(graph)))
-
-        # This measure is taking a LONG time to calculate. Leaving out for now.
-        #print("Average Shortest Path Length: " + str(nx.average_shortest_path_length(graph)))
+        # Average Shortest Path
+        print("ASP:" + str(nx.average_shortest_path_length(graph)))
 #END print_metrics
 
 def is_ascii(word):
