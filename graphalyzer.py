@@ -212,7 +212,7 @@ def print_metrics(graph):
         # Average Edge Complexity
         print("AEC:" + str(average_edge_complexity(graph)))
         # Average Shortest Path
-        print("ASP:" + str(nx.average_shortest_path_length(graph)))
+        print("ASP:" + str(average_distance))
         # <A_i> / <D_i> = A / D
         print("AD:" + str(average_adjacency(graph) / average_distance))
 #END print_metrics
