@@ -128,6 +128,16 @@ def shannon_graph_entropy(graph):
 
 #End shannon_graph_entropy
 
+def average_adjacency(graph):
+    adj = 0.0
+
+    for n in graph.nodes_iter():
+        adj = adj + n.out_degree(n)
+    #END For
+
+    return adj / graph.number_of_nodes()
+#END average_adjacency
+
 def main():
 
     # Parse command line arguments
@@ -181,26 +191,27 @@ def main():
     #END IF
 #END main
 def print_metrics(graph):
-        # Print out a few metrics
-        
+
+        # Pre-Computed Values Saved for Other Metrics
+        ivd = vector_degree_mag_info(graph)
+        si = shannon_graph_entropy(graph)
+        average_distance = nx.average_shortest_path_length(graph)
+       
+        # Print out metrics
         # Degree assortativity
         print("DA:" + str(nx.degree_assortativity_coefficient(graph)))
-        # Average Clustering Coefficient
-        #print("ACC:" + str(nx.average_clustering(graph)))
         # Information content of vector degree magnitudes
-        ivd = vector_degree_mag_info(graph)
         print("Ivd:" + str(ivd))
         # Normalized Ivd over the number of nodes in the graph
         print("Ivdnorm:" + str((ivd/graph.number_of_nodes())))
         # Shannon Graph Information based on edge weights, i.e., bigram counts
-        si = shannon_graph_entropy(graph)
         print("SI:" + str(si))
         print("SInorm:" + str(si / graph.number_of_nodes()))
         # Normalized Edge Complexity
         print("NEC:" + str(normalized_edge_complexity(graph)))
         # Average Edge Complexity
         print("AEC:" + str(average_edge_complexity(graph)))
-        # Average Shortest Path
+        # <A_i> / <D_i> = A / D
         print("ASP:" + str(nx.average_shortest_path_length(graph)))
 #END print_metrics
 
