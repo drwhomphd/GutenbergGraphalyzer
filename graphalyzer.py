@@ -74,7 +74,7 @@ def vector_degree_mag_info(graph):
     information_content = 0.0
 
     for n in graph.nodes():
-        degree = graph.degree(n)
+        degree = graph.out_degree(n)
 
         information_content = information_content + (degree * (math.log(degree,2)))
     #END for
@@ -110,7 +110,7 @@ def shannon_graph_entropy(graph):
         node_weight = 0.0
 
         # Add up edge weights for each node
-        for n0, n1, edata in graph.edges_iter(n, data=True):
+        for n0, n1, edata in graph.out_edges_iter(n, data=True):
 
             node_weight = node_weight + edata['weight']
             
@@ -186,7 +186,7 @@ def print_metrics(graph):
         # Degree assortativity
         print("DA:" + str(nx.degree_assortativity_coefficient(graph)))
         # Average Clustering Coefficient
-        print("ACC:" + str(nx.average_clustering(graph)))
+        #print("ACC:" + str(nx.average_clustering(graph)))
         # Information content of vector degree magnitudes
         print("Ivd:" + str(vector_degree_mag_info(graph)))
         # Shannon Graph Information based on edge weights, i.e., bigram counts
@@ -213,7 +213,7 @@ def is_ascii(word):
 def nltk_parse(input_file):
     # Open lit file...
     input = open(input_file, 'r')
-    word_graph = nx.Graph()
+    word_graph = nx.DiGraph()
    
     # Make sure the nltk related files are downloaded
     nltk.download("punkt")
@@ -298,7 +298,7 @@ def nltk_parse(input_file):
 def regexp_parse(input_file):
     # Open lit file...
     input = open(input_file, 'r')
-    word_graph = nx.Graph()
+    word_graph = nx.DiGraph()
 
     # Collected count of each word
     word_dictionary = {}
