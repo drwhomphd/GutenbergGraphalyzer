@@ -153,12 +153,30 @@ def distance_degree(graph, node):
     dist_degree = 0.0
 
     for n in graph.nodes_iter():
-        dist_degree = dist_degree + nx.shortest_path(graph, source=node, target=n)
+        dist_degree = dist_degree + nx.shortest_path_length(graph, source=node, target=n)
     #END for
 
     return dist_degree
 #END distance_degree
 
+"""
+Complexity Index B
+
+B = \sum{i=1}{V}{a_i / d_i}
+
+Implemented based on Bonchev and Buck's "Quantitative measure of network complexity" paper.
+"""
+def complexity_index_B(graph):
+
+    B = 0.0
+
+    for n in graph.nodes_iter():
+        B = B + (graph.out_degree(n) / distance_degree(graph, n))
+    #END for
+
+    return B
+
+#End complexity_index_B
 
 def main():
 
@@ -237,6 +255,8 @@ def print_metrics(graph):
         print("ASP:" + str(average_distance))
         # <A_i> / <D_i> = A / D
         print("AD:" + str(average_adjacency(graph) / average_distance))
+        # Complexity Index B
+        print("B:" + str(complexity_index_B(graph)))
 #END print_metrics
 
 def is_ascii(word):
@@ -333,7 +353,15 @@ def nltk_parse(input_file):
 
     input.close()
     return word_graph
-
+"""
+Regular expression parsing provides a very rudimentary set of parsing for the text file.
+It reads the file line by line and then splits each line based on one or more non-word 
+characters. The problem with splitting on one or more non-word characters is, partially,
+contractions will not be recorded, though the individual letters after them will become
+nodes in the graph. This is not quite as specific as the NLTK parsing. The other major
+difference is the regexp parsing has no recording of sentences, thus, stopping BiGrams
+from being recorded across sentence boundries is not possible.
+"""
 def regexp_parse(input_file):
     # Open lit file...
     input = open(input_file, 'r')
