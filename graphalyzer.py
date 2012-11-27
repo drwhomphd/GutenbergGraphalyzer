@@ -75,8 +75,8 @@ def vector_degree_mag_info(graph):
 
     for n in graph.nodes():
         degree = graph.out_degree(n)
-
-        information_content = information_content + (degree * (math.log(degree,2)))
+        if(degree > 0):
+            information_content = information_content + (degree * (math.log(degree,2)))
     #END for
 
 
