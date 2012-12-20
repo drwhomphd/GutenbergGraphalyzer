@@ -75,8 +75,8 @@ def vector_degree_mag_info(graph):
 
     for n in graph.nodes():
         degree = graph.out_degree(n)
-
-        information_content = information_content + (degree * (math.log(degree,2)))
+        if degree > 0:
+            information_content = information_content + (degree * (math.log(degree,2)))
     #END for
 
 
@@ -117,8 +117,8 @@ def shannon_graph_entropy(graph):
             # Continue calculating the total edge weight for H_max
             total_edge_weight = total_edge_weight + edata['weight']
         #END for
-
-        information_content = information_content + (node_weight * math.log(node_weight,2))
+        if node_weight > 0:
+            information_content = information_content + (node_weight * math.log(node_weight,2))
         
     #END for
 
