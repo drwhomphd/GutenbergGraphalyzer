@@ -191,7 +191,7 @@ def main():
             help="Filename to save the GraphViz Graph to. Automatically appends .dot")
     parser.add_argument('-n', '--nltk',
             dest="NLTK",
-            default=False,
+            default=True,
             action="store_true",
             help="Disable Regexp parsing and enable NLTK parsing.")
     parser.add_argument('-d', '--dir',
