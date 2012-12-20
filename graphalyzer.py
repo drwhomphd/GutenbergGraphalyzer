@@ -354,6 +354,9 @@ def nltk_parse(input_file):
                 # No? Set Count to 1
         # END FOR
 
+        # Don't save previous words between sentences
+        previous_word = ""
+
     #END FOR
 
 
