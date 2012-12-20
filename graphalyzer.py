@@ -235,7 +235,9 @@ def print_metrics(graph):
         # Pre-Computed Values Saved for Other Metrics
         ivd = vector_degree_mag_info(graph)
         si = shannon_graph_entropy(graph)
-        average_distance = nx.average_shortest_path_length(graph)
+        
+        # Takes too long
+        #average_distance = nx.average_shortest_path_length(graph)
        
         # Print out metrics
         # Degree assortativity
@@ -251,12 +253,16 @@ def print_metrics(graph):
         print("NEC:" + str(normalized_edge_complexity(graph)))
         # Average Edge Complexity
         print("AEC:" + str(average_edge_complexity(graph)))
+        
+        # Takes too long
         # Average Shortest Path
-        print("ASP:" + str(average_distance))
+        # print("ASP:" + str(average_distance))
+        # Takes too long
         # <A_i> / <D_i> = A / D
-        print("AD:" + str(average_adjacency(graph) / average_distance))
+        # print("AD:" + str(average_adjacency(graph) / average_distance))
+        # Takes too long
         # Complexity Index B
-        print("B:" + str(complexity_index_B(graph)))
+        # print("B:" + str(complexity_index_B(graph)))
 #END print_metrics
 
 def is_ascii(word):
