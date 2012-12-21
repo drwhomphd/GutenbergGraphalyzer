@@ -193,7 +193,12 @@ def main():
             dest="NLTK",
             default=True,
             action="store_true",
-            help="Disable Regexp parsing and enable NLTK parsing.")
+            help="Disable Regexp parsing and enable NLTK parsing. (No longer has an affect as Regexp is disabled by default.")
+    parser.add_argument('-U', '--gutenberg',
+            dest="GUTENBERG",
+            default=True,
+            action="store_true",
+            help="Enables support to skip header and footer material in project gutenberg books.")
     parser.add_argument('-d', '--dir',
             dest="DIR",
             help="Provide a directory of text files to parse instead of an individual file.")            
@@ -203,6 +208,7 @@ def main():
     GRAPH_FILE = args.GRAPH_FILE
     NLTK = args.NLTK
     DIR = args.DIR
+    GUTENBERG = args.GUTENBERG
 
     # The DIR and INPUT_FILE option cannot both be set
     if(DIR and INPUT_FILE):
@@ -299,12 +305,20 @@ def nltk_parse(input_file):
     
     # Always holds the previous word seene
     previous_word = ""
+
+    # Skip lines until we pass gutenbergs start delimiter
+    start_str = input.readline()
+    while (start_str.find("***START OF THE PROJECT GUTENBERG EBOOK") < 0):
+        start_str = input.readline()
    
     lines = input.read()
 
     # Tokenizing Sentences
     sentences = sent_tokenize(lines)
     for sentence in sentences:
+
+        if (sentence.find("***END OF THE PROJECT GUTENBERG EBOOK") >= 0):
+            break
 
         # Split the line in to individual words
         word_list = word_tokenize(sentence) 
