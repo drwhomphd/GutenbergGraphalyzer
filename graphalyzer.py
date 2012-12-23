@@ -75,7 +75,7 @@ def vector_degree_mag_info(graph):
 
     for n in graph.nodes():
         degree = graph.out_degree(n)
-        if(degree > 0):
+        if degree > 0:
             information_content = information_content + (degree * (math.log(degree,2)))
     #END for
 
@@ -117,8 +117,8 @@ def shannon_graph_entropy(graph):
             # Continue calculating the total edge weight for H_max
             total_edge_weight = total_edge_weight + edata['weight']
         #END for
-
-        information_content = information_content + (node_weight * math.log(node_weight,2))
+        if node_weight > 0:
+            information_content = information_content + (node_weight * math.log(node_weight,2))
         
     #END for
 
@@ -191,9 +191,14 @@ def main():
             help="Filename to save the GraphViz Graph to. Automatically appends .dot")
     parser.add_argument('-n', '--nltk',
             dest="NLTK",
-            default=False,
+            default=True,
             action="store_true",
-            help="Disable Regexp parsing and enable NLTK parsing.")
+            help="Disable Regexp parsing and enable NLTK parsing. (No longer has an affect as Regexp is disabled by default.")
+    parser.add_argument('-U', '--gutenberg',
+            dest="GUTENBERG",
+            default=True,
+            action="store_true",
+            help="Enables support to skip header and footer material in project gutenberg books.")
     parser.add_argument('-d', '--dir',
             dest="DIR",
             help="Provide a directory of text files to parse instead of an individual file.")            
@@ -203,6 +208,7 @@ def main():
     GRAPH_FILE = args.GRAPH_FILE
     NLTK = args.NLTK
     DIR = args.DIR
+    GUTENBERG = args.GUTENBERG
 
     # The DIR and INPUT_FILE option cannot both be set
     if(DIR and INPUT_FILE):
@@ -235,7 +241,9 @@ def print_metrics(graph):
         # Pre-Computed Values Saved for Other Metrics
         ivd = vector_degree_mag_info(graph)
         si = shannon_graph_entropy(graph)
-        average_distance = nx.average_shortest_path_length(graph)
+        
+        # Takes too long
+        #average_distance = nx.average_shortest_path_length(graph)
        
         # Print out metrics
         # Degree assortativity
@@ -251,12 +259,16 @@ def print_metrics(graph):
         print("NEC:" + str(normalized_edge_complexity(graph)))
         # Average Edge Complexity
         print("AEC:" + str(average_edge_complexity(graph)))
+        
+        # Takes too long
         # Average Shortest Path
-        print("ASP:" + str(average_distance))
+        # print("ASP:" + str(average_distance))
+        # Takes too long
         # <A_i> / <D_i> = A / D
-        print("AD:" + str(average_adjacency(graph) / average_distance))
+        # print("AD:" + str(average_adjacency(graph) / average_distance))
+        # Takes too long
         # Complexity Index B
-        print("B:" + str(complexity_index_B(graph)))
+        # print("B:" + str(complexity_index_B(graph)))
 #END print_metrics
 
 def is_ascii(word):
@@ -293,12 +305,20 @@ def nltk_parse(input_file):
     
     # Always holds the previous word seene
     previous_word = ""
+
+    # Skip lines until we pass gutenbergs start delimiter
+    start_str = input.readline()
+    while (start_str.find("***START OF THE PROJECT GUTENBERG EBOOK") < 0):
+        start_str = input.readline()
    
     lines = input.read()
 
     # Tokenizing Sentences
     sentences = sent_tokenize(lines)
     for sentence in sentences:
+
+        if (sentence.find("***END OF THE PROJECT GUTENBERG EBOOK") >= 0):
+            break
 
         # Split the line in to individual words
         word_list = word_tokenize(sentence) 
@@ -347,6 +367,9 @@ def nltk_parse(input_file):
                 # Yes? Increment Count
                 # No? Set Count to 1
         # END FOR
+
+        # Don't save previous words between sentences
+        previous_word = ""
 
     #END FOR
 
