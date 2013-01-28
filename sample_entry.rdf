@@ -1,0 +1,22 @@
+<pgterms:etext rdf:ID="etext12345">
+  <dc:publisher>&pg;</dc:publisher>
+  <dc:title rdf:parseType="Literal">Friday, the Thirteenth
+A Novel</dc:title>
+  <dc:creator rdf:parseType="Literal">Lawson, Thomas William, 1857-1925</dc:creator>
+  <dc:contributor rdf:parseType="Literal">Ivanowski, Sigismond de, 1875- [Illustrator]</dc:contributor>
+  <pgterms:friendlytitle rdf:parseType="Literal">Friday, the Thirteenth by Thomas William Lawson</pgterms:friendlytitle>
+  <dc:language><dcterms:ISO639-2><rdf:value>en</rdf:value></dcterms:ISO639-2></dc:language>
+  <dc:subject>
+    <rdf:Bag>
+      <rdf:li><dcterms:LCSH><rdf:value>Banks and banking, American -- Fiction</rdf:value></dcterms:LCSH></rdf:li>
+      <rdf:li><dcterms:LCSH><rdf:value>Stock exchanges -- United States -- Fiction</rdf:value></dcterms:LCSH></rdf:li>
+      <rdf:li><dcterms:LCSH><rdf:value>National banks (United States) -- Fiction</rdf:value></dcterms:LCSH></rdf:li>
+      <rdf:li><dcterms:LCSH><rdf:value>Banks and banking, International -- Fiction</rdf:value></dcterms:LCSH></rdf:li>
+      <rdf:li><dcterms:LCSH><rdf:value>Financial crises -- Fiction</rdf:value></dcterms:LCSH></rdf:li>
+    </rdf:Bag>
+  </dc:subject>
+  <dc:subject><dcterms:LCC><rdf:value>PS</rdf:value></dcterms:LCC></dc:subject>
+  <dc:created><dcterms:W3CDTF><rdf:value>2005-08-31</rdf:value></dcterms:W3CDTF></dc:created>
+  <pgterms:downloads><xsd:nonNegativeInteger><rdf:value>341</rdf:value></xsd:nonNegativeInteger></pgterms:downloads>
+  <dc:rights rdf:resource="&lic;" />
+</pgterms:etext>
