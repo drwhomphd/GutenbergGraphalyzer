@@ -34,14 +34,13 @@ def main():
     # Get a parsed list of etext files. They should only
     # hae the specific etext number.
 
-    #tree = ET.parse("catalog.rdf")
-    tree = ET.parse("catalogsample.rdf")
+    tree = ET.parse(CATALOG_FILE)
     root = tree.getroot()
 
     # Parse the RDF files keeping in mind the list of etexts
     # to minimize the information in the database
     #parse_single_book_rdf(root, file_list)
-    parse_catalog_rdf(root, bookid_to_filename, debug=True)
+    parse_catalog_rdf(root, bookid_to_filename, debug=False)
 
 #END
 
@@ -209,6 +208,8 @@ def add_author_to_db(dbc, ebookID, author_list):
 
     for author in author_list:
         # Place holder in case the author's aren't provided    
+        first = ""
+        last = ""
         born = ""
         death = ""
        
@@ -218,14 +219,24 @@ def add_author_to_db(dbc, ebookID, author_list):
 
         # This splits it in to last name, firstname, and birth/death
         parts = author.split(",")
-        
-        last = parts[0]
-        first = parts[1]
-       
-        # If the birthdeath is given, split it out, sometimes only
-        # birth or death will be given.
-        if(len(parts) > 2):
-            life = parts[2]
+
+        print parts
+
+        if (len(parts) == 0):
+            first = "Unknown"
+        if (len(parts) == 1):
+            last = parts[0]
+        if (len(parts) == 2):
+            last = parts[0]
+            first = parts[1]
+        if (len(parts) >= 3):
+            # If we have split in to 3 or more parts, it's possible that titles
+            # will get in the way of the birth/death. I've made the choice to ignore
+            # the titles. 
+
+            # If the birthdeath is given, split it out, sometimes only
+            # birth or death will be given.
+            life = parts[len(parts)-1]
             life = life.strip()
             life = life.split('-')
             born = life[0]
