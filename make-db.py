@@ -231,9 +231,17 @@ def add_author_to_db(dbc, ebookID, author_list):
         #END IF
 
         # Add the author to the author's database if they're not already there
+        r = dbc.execute("SELECT authorID FROM authordetails WHERE first=? AND last=?", (first, last,))
+        id = r.fetchone()
 
         # Add the author to the list of ebook ids and authors
+        if (id is None):
+            dbc.execute("INSERT INTO authordetails(first, last, birth, death) VALUES(?, ?, ?, ?)", (first, last, born, death,))
+            r = dbc.execute("SELECT authorID FROM authordetails WHERE first=? AND last=?", (first, last,))
+            id = r.fetchone()
+        #END IF
 
+        dbc.execute("INSERT INTO bookauthors VALUES(?,?)", (ebookID, id[0],))
     #END FOR
 
     return
@@ -245,7 +253,19 @@ and booksubjects at the same time to conserve space.
 def add_subject_to_db(dbc, ebookID, subject_list):
 
     for subject in subject_list:
-        dbc.execute("INSERT INTO subjectdetails(subject) VALUES (?)", (subject,))
+
+        # Need to obtain the subject ID if it exists.
+        r = dbc.execute("SELECT subjectID FROM subjectdetails WHERE subject=?", (subject,))
+        id = r.fetchone()
+        
+        if (id is None):
+            # If it doesn't exist we need to Insert the subject, get its id, then add it to the booksubjects
+            dbc.execute("INSERT INTO subjectdetails(subject) VALUES (?)", (subject,))
+            r = dbc.execute("SELECT subjectID FROM subjectdetails WHERE subject=?", (subject,))
+            id = r.fetchone()
+        # END IF
+        
+        dbc.execute("INSERT INTO booksubjects VALUES(?,?)", (ebookID, id[0],))
     #END FOR
 
 #END FUNCTION
