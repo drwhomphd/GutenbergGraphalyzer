@@ -8,11 +8,29 @@ import glob
 # of taken from the command line.
 CATALOG_FILE = "catalog.rdf"
 DATABASE_FILE = "catalog.db"
-TEXTS_DIR = "~/nobackup/TEXTS-UNIQUE"
+TEXTS_DIR = "/u/nhusted/nobackup/TEXTS-UNIQUE"
 
 def main():
 
-    file_list = []
+    file_list = glob.glob(TEXTS_DIR + "/*.txt") 
+    bookid_to_filename = {}
+
+    # Clean up the file list and create a dictionary that associates
+    # ebook id's to their filenames. 
+    for i in range(0, len(file_list)):
+        t = file_list[i].split("/")
+        file_list[i] = t[len(t)-1]
+
+        id = file_list[i]
+
+        for postfix in ["-0.txt", "-8.txt", ".txt"]:
+            id = id.replace(postfix, "")
+
+        bookid_to_filename[id] = file_list[i]
+
+    # END for
+
+    #print file_list
     # Get a parsed list of etext files. They should only
     # hae the specific etext number.
 
@@ -23,7 +41,7 @@ def main():
     # Parse the RDF files keeping in mind the list of etexts
     # to minimize the information in the database
     #parse_single_book_rdf(root, file_list)
-    parse_catalog_rdf(root, file_list, debug=True)
+    parse_catalog_rdf(root, bookid_to_filename, debug=True)
 
 #END
 
@@ -38,8 +56,6 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
     # Setup the sqlite connection here so the cursor can be passed
     # around to the various parse/insertion functions
     db_conn = sqlite3.connect(DATABASE_FILE)
-    db_curs = db_conn.cursor()
-    
 
     for child in tree_root:
         if(child.tag == "{http://www.gutenberg.org/rdfterms/}etext"):
@@ -60,9 +76,22 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             author = []
             subjects = []
             publisher = ""
+            downloads = ""
+            copyright = ""
+            filename = ""
             
             # This is the etext ID
             etextID = child.get("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}ID")
+            # The etext portion needs to be parsed off
+            etextID = etextID.replace("etext", "")
+
+            # Find the proper filename based on the etextID. 
+            filename = ebook_list.get(etextID, "")
+
+            # If we haven't found the filename by this point, skip the rest of this loop
+            # because we don't want to add the information to the database
+            if(filename == ""):
+                continue
 
             # Some books are missing the title field. One example had an empty friendly title.
             title_tag = child.find("{http://purl.org/dc/elements/1.1/}title")
@@ -95,16 +124,18 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             for subject in child.findall(".//{http://purl.org/dc/terms/}LCC/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value"):
                 subjects.append(subject.text.encode("utf-8"))
 
-
-
+            
             # Add all relevant information to the database
-            add_ebook_to_db(db_curs, ebookID, title, copyright, downloads, filename)
-            add_author_to_db(db_curs, ebookID, author_list)
-            add_subject_to_db(db_curs, ebookID, subject_list)
+            # The order of these three functions is IMPORTANT due to foreign key 
+            # requirements. Must always be add_ebook_to_db first.
+            add_ebook_to_db(db_conn, etextID, title, publisher, copyright, downloads, filename)
+            add_author_to_db(db_conn, etextID, author)
+            add_subject_to_db(db_conn, etextID, subjects)
 
             # Print out information if we're debugging
             if(debug == True):
                 print etextID
+                print filename
                 print title
                 for name in author:
                     print name
@@ -117,7 +148,7 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             print("Unparsed tag: %s" % child.tag)
         #END IF
     #END FOR
-
+    db_conn.commit()
     db_conn.close()
 
 #END FUNCTION
@@ -161,7 +192,10 @@ def parse_single_book_rdf(tree_root, ebook_list):
             continue
 # END
 
-def add_ebook_to_db(cursor, ebookID, title, copyright, downloads, filename):
+def add_ebook_to_db(dbc, ebookID, title, publisher, copyright, downloads, filename):
+
+    dbc.execute("INSERT INTO ebooks VALUES (?,?,?,?,?)", (ebookID, title, copyright, downloads, filename))
+
     return
 
 """
@@ -169,15 +203,52 @@ The name field from the catalogue will have the author's birth and death
 date. To safe space both the author is added to author details, if the
 author doesn't currently exist, and then added to bookauthors.
 """
-def add_author_to_db(cursor, ebookID, author_list):
+def add_author_to_db(dbc, ebookID, author_list):
+
+    for author in author_list:
+        # Place holder in case the author's aren't provided    
+        born = ""
+        death = ""
+       
+        # We need to clean up the extra informationin the field
+        author = author.strip()
+        author = author.replace(" [Contributor]", "")
+
+        # This splits it in to last name, firstname, and birth/death
+        parts = author.split(",")
+        
+        last = parts[0]
+        first = parts[1]
+       
+        # If the birthdeath is given, split it out, sometimes only
+        # birth or death will be given.
+        if(len(parts) > 2):
+            life = parts[2]
+            life = life.strip()
+            life = life.split('-')
+            born = life[0]
+            death = life[1]
+        #END IF
+
+        # Add the author to the author's database if they're not already there
+
+        # Add the author to the list of ebook ids and authors
+
+    #END FOR
+
     return
 
 """
 The subject is added to subjectdetails, if it does not already exist,
 and booksubjects at the same time to conserve space. 
 """
-def add_subject_to_db(cursor, ebookID, subject_list):
-    return
+def add_subject_to_db(dbc, ebookID, subject_list):
+
+    for subject in subject_list:
+        dbc.execute("INSERT INTO subjectdetails(subject) VALUES (?)", (subject,))
+    #END FOR
+
+#END FUNCTION
 
 if __name__ == "__main__":
     main()
