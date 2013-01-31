@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import xml.etree.cElementTree as ET
 import sqlite3
@@ -65,7 +65,7 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
 
             # Sometimes the language field doesn't exist
             if (language is not None and language.text != "en"):
-                print "Not English... skipping..."
+                print("Not English... skipping...")
                 continue
             #END if
 
@@ -95,7 +95,8 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             # Some books are missing the title field. One example had an empty friendly title.
             title_tag = child.find("{http://purl.org/dc/elements/1.1/}title")
             if(title_tag is not None):
-                title = title_tag.text.encode("utf-8")
+                #title = title_tag.text.encode("utf-8")
+                title = title_tag.text
             #END IF
 
             # Authors can be either single names under creator or multiple names in a list of
@@ -104,13 +105,16 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             if (creator == None):
                contributors = child.findall("{http://purl.org/dc/elements/1.1/}contributor/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}Bag/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}li")
                for contributor in contributors:
-                   author.append(contributor.text.encode("utf-8"))
+                   #author.append(contributor.text.encode("utf-8"))
+                   author.append(contributor.text)
             else:
-                author.append(creator.text.encode("utf-8"))
+                #author.append(creator.text.encode("utf-8"))
+                author.append(creator.text)
             #End if
 
             publisher_name = child.find("{http://purl.org/dc/elements/1.1/}publisher")
-            publisher =  publisher_name.text.encode("utf-8")
+            #publisher =  publisher_name.text.encode("utf-8")
+            publisher =  publisher_name.text
 
             downloads = child.find("{http://www.gutenberg.org/rdfterms/}downloads/{http://www.w3.org/2001/XMLSchema#}nonNegativeInteger/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value").text.encode("utf-8")
 
@@ -121,22 +125,24 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             #      {http://www.w3.org/1999/02/22-rdf-syntax-ns#}li
             #          {http://purl.org/dc/terms/}LCSH
             for subject in child.findall(".//{http://purl.org/dc/terms/}LCSH/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value"):
-                subjects.append(subject.text.encode("utf-8"))
+                #subjects.append(subject.text.encode("utf-8"))
+                subjects.append(subject.text)
             for subject in child.findall(".//{http://purl.org/dc/terms/}LCC/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value"):
-                subjects.append(subject.text.encode("utf-8"))
+                #subjects.append(subject.text.encode("utf-8"))
+                subjects.append(subject.text)
 
             # Print out information if we're debugging otherwise we add it to the database
             if(debug == True):
-                print etextID
-                print filename
-                print downloads
-                print title
+                print(etextID)
+                print(filename)
+                print(downloads)
+                print(title)
                 for name in author:
-                    print name
-                print publisher
+                    print(name)
+                print(publisher)
                 for subject in subjects:
-                    print subject
-                print "---------------"
+                    print(subject)
+                print("---------------")
             else:
                 # Add all relevant information to the database
                 # The order of these three functions is IMPORTANT due to foreign key 
@@ -146,7 +152,7 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
                 add_subject_to_db(db_conn, etextID, subjects)
             #END IF
         else:
-            print("Unparsed tag: %s" % child.tag)
+            print(("Unparsed tag: %s" % child.tag))
         #END IF
     #END FOR
     db_conn.commit()
@@ -159,46 +165,44 @@ Parses the single book RDF files. They contain far more information than the
 catalog equivalents. In this case detailed information about authors, file
 types, and the etexts themselves.
 """
-def parse_single_book_rdf(tree_root, ebook_list):
-    #for ebook in root.findall("{http://www.gutenberg.org/2009/pgterms/}ebook"):
-    for child in tree_root:
-
-        print child.tag
-        print child.attrib
-
-        # We iterate through the children and switch over an ebook or agent
-        # because this means we only loop over all entries once instead of
-        # with the findall which potentially means we scan the document twice.
-        # Only used with single book rdf texts
-        if(child.tag == "{http://www.gutenberg.org/2009/pgterms/}ebook"):
-            # Get the ebook number
-            print child.attrib['{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about']
-
-            # Get specific ebook information
-            for title in child.findall("{http://purl.org/dc/terms/}title"):
-                print title.text
-
-            # Get Copyright information
-            for marc260 in child.findall("{http://www.gutenberg.org/2009/pgterms/}marc260"):
-                print marc260.text
-
-
-            print "###"
-        elif(child.tag == "{http://www.gutenberg.org/2009/pgterms/}agent"):
-
-            for author_name in child.findall("{http://www.gutenberg.org/2009/pgterms/}name"):
-                print author_name.text
-
-        else: # Any other tags we don't care about
-            continue
+#def parse_single_book_rdf(tree_root, ebook_list):
+#    #for ebook in root.findall("{http://www.gutenberg.org/2009/pgterms/}ebook"):
+#    for child in tree_root:
+#
+##        print child.tag
+##        print child.attrib
+#
+#        # We iterate through the children and switch over an ebook or agent
+#        # because this means we only loop over all entries once instead of
+#        # with the findall which potentially means we scan the document twice.
+#        # Only used with single book rdf texts
+#        if(child.tag == "{http://www.gutenberg.org/2009/pgterms/}ebook"):
+#            # Get the ebook number
+##            print child.attrib['{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about']
+#
+#            # Get specific ebook information
+#            for title in child.findall("{http://purl.org/dc/terms/}title"):
+##                print title.text
+#
+#            # Get Copyright information
+#            for marc260 in child.findall("{http://www.gutenberg.org/2009/pgterms/}marc260"):
+##                print marc260.text
+#
+#
+##            print "###"
+#        elif(child.tag == "{http://www.gutenberg.org/2009/pgterms/}agent"):
+#
+#            for author_name in child.findall("{http://www.gutenberg.org/2009/pgterms/}name"):
+##                print author_name.text
+#
+#        else: # Any other tags we don't care about
+#            continue
 # END
-
 def add_ebook_to_db(dbc, ebookID, title, publisher, copyright, downloads, filename):
 
         dbc.execute("INSERT INTO ebooks VALUES (?,?,?,?,?)", (ebookID, title, copyright, downloads, filename))
 
 #END FUNCTION
-
 """
 The name field from the catalogue will have the author's birth and death
 date. To safe space both the author is added to author details, if the
@@ -216,11 +220,10 @@ def add_author_to_db(dbc, ebookID, author_list):
         # We need to clean up the extra informationin the field
         author = author.strip()
         author = author.replace(" [Contributor]", "")
+        author = author.replace(" [Editor]", "")
 
         # This splits it in to last name, firstname, and birth/death
         parts = author.split(",")
-
-        print parts
 
         if (len(parts) == 0):
             first = "Unknown"
@@ -238,9 +241,14 @@ def add_author_to_db(dbc, ebookID, author_list):
             # birth or death will be given.
             life = parts[len(parts)-1]
             life = life.strip()
-            life = life.split('-')
-            born = life[0]
-            death = life[1]
+            
+            # It's possible for there not to be a '-' and that an author's birth/death is just
+            # given as a century. If that's the case, we set it as empty
+            if '-' in life:
+                life = life.split('-')
+                born = life[0]
+                death = life[1]
+            #END IF
         #END IF
 
         # Add the author to the author's database if they're not already there
@@ -273,7 +281,7 @@ def add_subject_to_db(dbc, ebookID, subject_list):
         
         if (id is None):
             # If it doesn't exist we need to Insert the subject, get its id, then add it to the booksubjects
-            dbc.execute("INSERT INTO subjectdetails(subject) VALUES (?)", (subject.encode("utf-8"),))
+            dbc.execute("INSERT INTO subjectdetails(subject) VALUES (?)", (subject,))
             r = dbc.execute("SELECT subjectID FROM subjectdetails WHERE subject=?", (subject,))
             id = r.fetchone()
         # END IF
