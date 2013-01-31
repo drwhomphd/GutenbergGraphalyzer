@@ -112,7 +112,7 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             publisher_name = child.find("{http://purl.org/dc/elements/1.1/}publisher")
             publisher =  publisher_name.text.encode("utf-8")
 
-            downloads = child.find("{http://www.gutenberg.org/rdfterms/}downloads/{http://www.w3.org/2001/XMLSchema#}nonNegativeInteger/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value").text
+            downloads = child.find("{http://www.gutenberg.org/rdfterms/}downloads/{http://www.w3.org/2001/XMLSchema#}nonNegativeInteger/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value").text.encode("utf-8")
 
 
             # The full path for the LCSH elements is actually:
@@ -195,9 +195,9 @@ def parse_single_book_rdf(tree_root, ebook_list):
 
 def add_ebook_to_db(dbc, ebookID, title, publisher, copyright, downloads, filename):
 
-    dbc.execute("INSERT INTO ebooks VALUES (?,?,?,?,?)", (ebookID, title, copyright, downloads, filename))
+        dbc.execute("INSERT INTO ebooks VALUES (?,?,?,?,?)", (ebookID, title, copyright, downloads, filename))
 
-    return
+#END FUNCTION
 
 """
 The name field from the catalogue will have the author's birth and death
@@ -273,7 +273,7 @@ def add_subject_to_db(dbc, ebookID, subject_list):
         
         if (id is None):
             # If it doesn't exist we need to Insert the subject, get its id, then add it to the booksubjects
-            dbc.execute("INSERT INTO subjectdetails(subject) VALUES (?)", (subject,))
+            dbc.execute("INSERT INTO subjectdetails(subject) VALUES (?)", (subject.encode("utf-8"),))
             r = dbc.execute("SELECT subjectID FROM subjectdetails WHERE subject=?", (subject,))
             id = r.fetchone()
         # END IF
