@@ -113,7 +113,7 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             publisher_name = child.find("{http://purl.org/dc/elements/1.1/}publisher")
             publisher =  publisher_name.text.encode("utf-8")
 
-            download_count = child.find(
+            downloads = child.find("{http://www.gutenberg.org/rdfterms/}downloads/{http://www.w3.org/2001/XMLSchema#}nonNegativeInteger/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value").text
 
 
             # The full path for the LCSH elements is actually:
@@ -130,6 +130,7 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             if(debug == True):
                 print etextID
                 print filename
+                print downloads
                 print title
                 for name in author:
                     print name
