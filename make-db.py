@@ -113,6 +113,8 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             publisher_name = child.find("{http://purl.org/dc/elements/1.1/}publisher")
             publisher =  publisher_name.text.encode("utf-8")
 
+            download_count = child.find(
+
 
             # The full path for the LCSH elements is actually:
             #{http://purl.org/dc/terms/}subject
@@ -124,15 +126,7 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             for subject in child.findall(".//{http://purl.org/dc/terms/}LCC/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value"):
                 subjects.append(subject.text.encode("utf-8"))
 
-            
-            # Add all relevant information to the database
-            # The order of these three functions is IMPORTANT due to foreign key 
-            # requirements. Must always be add_ebook_to_db first.
-            add_ebook_to_db(db_conn, etextID, title, publisher, copyright, downloads, filename)
-            add_author_to_db(db_conn, etextID, author)
-            add_subject_to_db(db_conn, etextID, subjects)
-
-            # Print out information if we're debugging
+            # Print out information if we're debugging otherwise we add it to the database
             if(debug == True):
                 print etextID
                 print filename
@@ -143,6 +137,13 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
                 for subject in subjects:
                     print subject
                 print "---------------"
+            else:
+                # Add all relevant information to the database
+                # The order of these three functions is IMPORTANT due to foreign key 
+                # requirements. Must always be add_ebook_to_db first.
+                add_ebook_to_db(db_conn, etextID, title, publisher, copyright, downloads, filename)
+                add_author_to_db(db_conn, etextID, author)
+                add_subject_to_db(db_conn, etextID, subjects)
             #END IF
         else:
             print("Unparsed tag: %s" % child.tag)
