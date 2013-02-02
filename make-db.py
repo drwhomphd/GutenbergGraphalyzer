@@ -3,10 +3,12 @@
 import xml.etree.cElementTree as ET
 import sqlite3
 import glob
+import re
 
 # Given the rare usage of this script the parameters are hardcoded instead
 # of taken from the command line.
 CATALOG_FILE = "catalog.rdf"
+#CATALOG_FILE = "catalogsample.rdf"
 DATABASE_FILE = "catalog.db"
 TEXTS_DIR = "/u/nhusted/nobackup/TEXTS-UNIQUE"
 
@@ -214,42 +216,40 @@ def add_author_to_db(dbc, ebookID, author_list):
         # Place holder in case the author's aren't provided    
         first = ""
         last = ""
-        born = ""
+        birth = ""
         death = ""
        
         # We need to clean up the extra informationin the field
+        pattern = re.compile("\[\w*\]")
         author = author.strip()
-        author = author.replace(" [Contributor]", "")
-        author = author.replace(" [Editor]", "")
+        author = pattern.sub("", author)
 
         # This splits it in to last name, firstname, and birth/death
         parts = author.split(",")
 
         if (len(parts) == 0):
             first = "Unknown"
-        if (len(parts) == 1):
-            last = parts[0]
-        if (len(parts) == 2):
-            last = parts[0]
-            first = parts[1]
-        if (len(parts) >= 3):
-            # If we have split in to 3 or more parts, it's possible that titles
-            # will get in the way of the birth/death. I've made the choice to ignore
-            # the titles. 
+            last = "Unknown"
+        #END IF
 
-            # If the birthdeath is given, split it out, sometimes only
-            # birth or death will be given.
-            life = parts[len(parts)-1]
-            life = life.strip()
-            
+        for i in range(0,len(parts)):
             # It's possible for there not to be a '-' and that an author's birth/death is just
             # given as a century. If that's the case, we set it as empty
-            if '-' in life:
-                life = life.split('-')
-                born = life[0]
-                death = life[1]
+            if("-" in parts[i]):
+                life = parts[i].split('-')
+                birth = life[0].strip()
+                death = life[1].strip()
+            else:
+                # If it's the 0th element, it's a last name
+                if (i == 0):
+                    last = parts[i].strip()
+                elif (i == 1): # If it's the 1st element, its a first name
+                    first = parts[i].strip()
+                else: # any other element is a title and we'll ignore it for now
+                    continue
             #END IF
-        #END IF
+        #END FOR
+
 
         # Add the author to the author's database if they're not already there
         r = dbc.execute("SELECT authorID FROM authordetails WHERE first=? AND last=?", (first, last,))
@@ -257,7 +257,7 @@ def add_author_to_db(dbc, ebookID, author_list):
 
         # Add the author to the list of ebook ids and authors
         if (id is None):
-            dbc.execute("INSERT INTO authordetails(first, last, birth, death) VALUES(?, ?, ?, ?)", (first, last, born, death,))
+            dbc.execute("INSERT INTO authordetails(first, last, birth, death) VALUES(?, ?, ?, ?)", (first, last, birth, death,))
             r = dbc.execute("SELECT authorID FROM authordetails WHERE first=? AND last=?", (first, last,))
             id = r.fetchone()
         #END IF
