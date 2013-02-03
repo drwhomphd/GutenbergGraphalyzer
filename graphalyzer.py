@@ -1,5 +1,6 @@
 #!/usr/bin/python
 from __future__ import division
+
 """
      This file is part of Gutenberg Graphalyzer
      Gutenberg Graphalyzer is free software: you can redistribute it and/or modify
@@ -15,6 +16,7 @@ from __future__ import division
      You should have received a copy of the GNU General Public License
      along with Gutenberg Graphalyzer.  If not, see <http://www.gnu.org/licenses/>.
 """
+
 from nltk.tokenize import *
 import nltk
 import re
@@ -22,6 +24,7 @@ import networkx as nx
 import argparse
 import math
 import sys
+import sqlite3
 
 """
 Average Edge Complexity
@@ -189,6 +192,10 @@ def main():
             dest="GRAPH_FILE",
             default=False,
             help="Filename to save the GraphViz Graph to. Automatically appends .dot")
+    parser.add_argument('-o', '--output-db',
+            dest="OUTPUTDB",
+            default=False,
+            help="The database file to store experiment results.")
     parser.add_argument('-n', '--nltk',
             dest="NLTK",
             default=True,
@@ -199,21 +206,13 @@ def main():
             default=True,
             action="store_true",
             help="Enables support to skip header and footer material in project gutenberg books.")
-    parser.add_argument('-d', '--dir',
-            dest="DIR",
-            help="Provide a directory of text files to parse instead of an individual file.")            
 
     args = parser.parse_args()
     INPUT_FILE = args.INPUT_FILE
     GRAPH_FILE = args.GRAPH_FILE
     NLTK = args.NLTK
-    DIR = args.DIR
     GUTENBERG = args.GUTENBERG
-
-    # The DIR and INPUT_FILE option cannot both be set
-    if(DIR and INPUT_FILE):
-        print("DIR and INPUT_FILE option are mutually exclusive.")
-        sys.exit(-1)
+    OUTPUTDB = args.OUTPUTDB
 
     graph = None
 
@@ -224,51 +223,61 @@ def main():
             graph = regexp_parse(INPUT_FILE)
         #END if
 
-        print_metrics(graph)
+        # Parse the etext ID out of the INPUT_FILE name
+        etextid = INPUT_FILE
+        for postfix in ["-0.txt", "-8.txt", ".txt"]:
+            etextid = etextid.replace(postfix, "")
+       
+
+        # Pre-Computed Values Saved for Other Metrics
+        ivd = vector_degree_mag_info(graph)
+        si = shannon_graph_entropy(graph)
+
+        # Compute all other metrics
+        da = nx.degree_assortativity_coefficient(graph)
+        ivdnorm = ivd/graph.number_of_nodes()
+        sinorm = si / graph.number_of_nodes()
+        nec = normalized_edge_complexity(graph)
+        aec = average_edge_complexity(graph)
+        
+        # Metrics that take too long
+        # average_distance = nx.average_shortest_path_length(graph)
+        # <A_i> / <D_i> = A / D
+        # ad = average_adjacency(graph) / average_distance)
+        # Complexity Index B
+        # bcomplex = complexity_index_B(graph)
+       
+        print("EbookID: %s" % etextid)
+        # Print out metrics
+        # Degree assortativity
+        print("DA:" + str(da))
+        # Information content of vector degree magnitudes
+        print("Ivd:" + str(ivd))
+        # Normalized Ivd over the number of nodes in the graph
+        print("Ivdnorm:" + str(ivdnorm))
+        # Shannon Graph Information based on edge weights, i.e., bigram counts
+        print("SI:" + str(si))
+        print("SInorm:" + str(sinorm))
+        # Normalized Edge Complexity
+        print("NEC:" + str(nec))
+        # Average Edge Complexity
+        print("AEC:" + str(aec))
+        
+        # Takes too long
+
+       # The database connection is optional for testing
+       # purposes
+        if(OUTPUTDB):
+            # Connect to the output database
+            dbconn = sqlite3.connect(OUTPUTDB)
 
         # Export the graph
         if(GRAPH_FILE):
             nx.write_dot(graph, GRAPH_FILE + ".dot")
         #END if
     #END if
-
-    if(DIR):
-        return
-    #END IF
 #END main
-def print_metrics(graph):
 
-        # Pre-Computed Values Saved for Other Metrics
-        ivd = vector_degree_mag_info(graph)
-        si = shannon_graph_entropy(graph)
-        
-        # Takes too long
-        #average_distance = nx.average_shortest_path_length(graph)
-       
-        # Print out metrics
-        # Degree assortativity
-        print("DA:" + str(nx.degree_assortativity_coefficient(graph)))
-        # Information content of vector degree magnitudes
-        print("Ivd:" + str(ivd))
-        # Normalized Ivd over the number of nodes in the graph
-        print("Ivdnorm:" + str((ivd/graph.number_of_nodes())))
-        # Shannon Graph Information based on edge weights, i.e., bigram counts
-        print("SI:" + str(si))
-        print("SInorm:" + str(si / graph.number_of_nodes()))
-        # Normalized Edge Complexity
-        print("NEC:" + str(normalized_edge_complexity(graph)))
-        # Average Edge Complexity
-        print("AEC:" + str(average_edge_complexity(graph)))
-        
-        # Takes too long
-        # Average Shortest Path
-        # print("ASP:" + str(average_distance))
-        # Takes too long
-        # <A_i> / <D_i> = A / D
-        # print("AD:" + str(average_adjacency(graph) / average_distance))
-        # Takes too long
-        # Complexity Index B
-        # print("B:" + str(complexity_index_B(graph)))
 #END print_metrics
 
 def is_ascii(word):
