@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE rdf:RDF [
+  <!ENTITY pg  "Project Gutenberg">
+  <!ENTITY lic "http://www.gutenberg.org/license">
+  <!ENTITY f   "http://www.gutenberg.org/">
+]>
+
+<!-- 
+
+The Project Gutenberg Catalog in RDF/XML Format
+
+  Copyright (C) 2004-present by 
+
+  Project Gutenberg Literary Archive Foundation
+  4557 Melan Drive S.
+  Fairbanks AK 99712
+  U.S.A.
+
+
+LICENSE TERMS
+
+
+This file ("work") is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License (GPL)
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This work is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Please become familiar with the GNU GPL before using this file.
+
+You can get a full copy of the GNU General Public License online at:
+
+  http://www.gnu.org/licenses/gpl.html
+
+The GNU General Public License is explained in human language at:
+
+  http://creativecommons.org/licenses/GPL/2.0/
+
+If you are uncertain about the terms of the license or whether your
+intended use is legitimate, please email gbnewby@pglaf.org for
+clarification.
+
+Thank you for your interest in Project Gutenberg.  For more
+information about Project Gutenberg and its goals, visit
+the Official Project Gutenberg Web site at 
+
+  http://www.gutenberg.org
+
+-->
+
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dcterms="http://purl.org/dc/terms/"
+         xmlns:dcmitype="http://purl.org/dc/dcmitype/"
+         xmlns:cc="http://web.resource.org/cc/"
+         xmlns:pgterms="http://www.gutenberg.org/rdfterms/"
+         xml:base="http://www.gutenberg.org/feeds/catalog.rdf">
+
+<cc:Work rdf:about="">
+   <cc:license  rdf:resource="http://creativecommons.org/licenses/GPL/2.0/" />
+</cc:Work>
+
+<cc:License rdf:about="http://creativecommons.org/licenses/GPL/2.0/">
+   <cc:permits  rdf:resource="http://web.resource.org/cc/Reproduction" />
+   <cc:permits  rdf:resource="http://web.resource.org/cc/Distribution" />
+   <cc:requires rdf:resource="http://web.resource.org/cc/Notice" />
+   <cc:permits  rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+   <cc:requires rdf:resource="http://web.resource.org/cc/ShareAlike" />
+   <cc:requires rdf:resource="http://web.resource.org/cc/SourceCode" />
+</cc:License>
+
+<rdf:Description rdf:about="">
+  <dc:created><dcterms:W3CDTF><rdf:value>2012-12-23</rdf:value></dcterms:W3CDTF></dc:created>
+</rdf:Description>
+
+
+<pgterms:etext rdf:ID="etext15041">
+  <dc:publisher>&pg;</dc:publisher>
+  <dc:title rdf:parseType="Literal">The Negro Problem</dc:title>
+  <dc:tableOfContents rdf:parseType="Literal">Industrial education for the Negro / Booker T. Washington -- The talented tenth / W.E. Burghardt DuBois -- The disfranchisement of the Negro / Charles W. Chesnutt -- The Negro and the law / Wilford H. Smith -- The characteristics of the Negro people / H.T. Kealing -- Representative American Negroes / Paul Laurence Dunbar -- The Negro's place in American life at the present day / T. Thomas Fortune.</dc:tableOfContents>
+  <dc:contributor>
+    <rdf:Bag>
+      <rdf:li rdf:parseType="Literal">Fortune, Timothy Thomas, 1856-1928 [Contributor]</rdf:li>
+      <rdf:li rdf:parseType="Literal">Smith, Wilford H. [Contributor]</rdf:li>
+      <rdf:li rdf:parseType="Literal">Dunbar, Paul Laurence, 1872-1906 [Contributor]</rdf:li>
+      <rdf:li rdf:parseType="Literal">Washington, Booker T., 1856-1915 [Contributor]</rdf:li>
+      <rdf:li rdf:parseType="Literal">Kealing, H. T. (Hightower Theodore), 1860-1918 [Contributor]</rdf:li>
+      <rdf:li rdf:parseType="Literal">Du Bois, W. E. B. (William Edward Burghardt), 1868-1963 [Contributor]</rdf:li>
+      <rdf:li rdf:parseType="Literal">Chesnutt, Charles W. (Charles Waddell), 1858-1932 [Contributor]</rdf:li>
+    </rdf:Bag>
+  </dc:contributor>
+  <pgterms:friendlytitle rdf:parseType="Literal">The Negro Problem</pgterms:friendlytitle>
+  <dc:language><dcterms:ISO639-2><rdf:value>en</rdf:value></dcterms:ISO639-2></dc:language>
+  <dc:subject>
+    <rdf:Bag>
+      <rdf:li><dcterms:LCSH><rdf:value>African Americans -- Social conditions -- To 1964</rdf:value></dcterms:LCSH></rdf:li>
+      <rdf:li><dcterms:LCSH><rdf:value>African Americans</rdf:value></dcterms:LCSH></rdf:li>
+      <rdf:li><dcterms:LCSH><rdf:value>African Americans -- Politics and government -- 20th century</rdf:value></dcterms:LCSH></rdf:li>
+    </rdf:Bag>
+  </dc:subject>
+  <dc:subject><dcterms:LCC><rdf:value>E151</rdf:value></dcterms:LCC></dc:subject>
+  <dc:created><dcterms:W3CDTF><rdf:value>2005-02-14</rdf:value></dcterms:W3CDTF></dc:created>
+  <pgterms:downloads><xsd:nonNegativeInteger><rdf:value>251</rdf:value></xsd:nonNegativeInteger></pgterms:downloads>
+  <dc:rights rdf:resource="&lic;" />
+</pgterms:etext>
+
+</rdf:RDF>
