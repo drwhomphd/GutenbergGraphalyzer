@@ -217,11 +217,7 @@ def main():
     graph = None
 
     if(INPUT_FILE):
-        if(NLTK):
-            graph = nltk_parse(INPUT_FILE)
-        else:
-            graph = regexp_parse(INPUT_FILE)
-        #END if
+        graph = nltk_parse(INPUT_FILE)
 
         # Parse the etext ID out of the INPUT_FILE name
         etextid = INPUT_FILE
