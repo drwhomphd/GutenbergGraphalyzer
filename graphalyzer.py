@@ -305,6 +305,8 @@ def nltk_parse(input_file):
     """
     # Compile the regexp we use to detect punctuation
     punc_regexp = re.compile("\W+$")
+    start_regexp = re.compile("^\*\*\*\s{0,1}START OF")
+    end_regexp = re.compile("\*\*\*\s{0,1}END\s*OF")
 
     total_words = 0
     
@@ -313,16 +315,16 @@ def nltk_parse(input_file):
 
     # Skip lines until we pass gutenbergs start delimiter
     start_str = input.readline()
-    while (start_str.find("***START OF THE PROJECT GUTENBERG EBOOK") < 0):
+    while (start_regexp.match(start_str) == None):
         start_str = input.readline()
+
    
     lines = input.read()
 
     # Tokenizing Sentences
     sentences = sent_tokenize(lines)
     for sentence in sentences:
-
-        if (sentence.find("***END OF THE PROJECT GUTENBERG EBOOK") >= 0):
+        if (end_regexp.search(sentence) != None):
             break
 
         # Split the line in to individual words
