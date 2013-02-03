@@ -26,6 +26,9 @@ import math
 import sys
 import sqlite3
 
+# GLOBALS
+VERSION = 1.0
+
 """
 Average Edge Complexity
 < a_i > = \frac{A}{V} = \frac{E_g}{V} = E_a
@@ -266,6 +269,14 @@ def main():
         if(OUTPUTDB):
             # Connect to the output database
             dbconn = sqlite3.connect(OUTPUTDB)
+
+            dbconn.execute('''INSERT INTO experiments(
+                versionnumber, etextID, da,
+                ivd, ivdnorm, si, sinorm,
+                nec, AEC) VALUES (?,?,?,?,?,?,?,?,?);''', (VERSION, etextid, da, ivd, ivdnorm, si, sinorm, nec, aec))
+        # END if
+        dbconn.commit()
+        dbconn.close()
 
         # Export the graph
         if(GRAPH_FILE):
