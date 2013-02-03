@@ -243,7 +243,7 @@ def main():
         # Complexity Index B
         # bcomplex = complexity_index_B(graph)
        
-        print("EbookID: %s" % etextid)
+        print("EbookID:%s" % etextid)
         # Print out metrics
         # Degree assortativity
         print("DA:" + str(da))
