@@ -223,7 +223,8 @@ def main():
         graph = nltk_parse(INPUT_FILE)
 
         # Parse the etext ID out of the INPUT_FILE name
-        etextid = INPUT_FILE
+        path = INPUT_FILE.split('/')
+        etextid = path[len(path)-1]
         for postfix in ["-0.txt", "-8.txt", ".txt"]:
             etextid = etextid.replace(postfix, "")
        
@@ -274,9 +275,9 @@ def main():
                 versionnumber, etextID, da,
                 ivd, ivdnorm, si, sinorm,
                 nec, AEC) VALUES (?,?,?,?,?,?,?,?,?);''', (VERSION, etextid, da, ivd, ivdnorm, si, sinorm, nec, aec))
+            dbconn.commit()
+            dbconn.close()
         # END if
-        dbconn.commit()
-        dbconn.close()
 
         # Export the graph
         if(GRAPH_FILE):
