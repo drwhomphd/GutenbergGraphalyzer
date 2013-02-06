@@ -128,7 +128,11 @@ def shannon_graph_entropy(graph):
         
     #END for
 
-    information_content = (total_edge_weight * math.log(total_edge_weight,2)) - information_content
+    if(total_edge_weight > 0):
+        information_content = (total_edge_weight * math.log(total_edge_weight,2)) - information_content
+    else:
+        information_content = 0
+    #END if
 
     return information_content
 
