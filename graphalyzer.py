@@ -321,7 +321,7 @@ def nltk_parse(input_file):
     """
     # Compile the regexp we use to detect punctuation
     punc_regexp = re.compile("\W+$")
-    start_regexp = re.compile("^\*\*\*\s{0,1}START OF")
+    start_regexp = re.compile("\*\*\*\s{0,1}START OF")
     end_regexp = re.compile("\*\*\*\s{0,1}END\s*OF")
 
     total_words = 0
@@ -331,7 +331,7 @@ def nltk_parse(input_file):
 
     # Skip lines until we pass gutenbergs start delimiter
     start_str = input.readline()
-    while (start_regexp.match(start_str) == None):
+    while (start_regexp.search(start_str) == None):
         start_str = input.readline()
 
    
