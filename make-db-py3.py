@@ -97,20 +97,17 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             # Some books are missing the title field. One example had an empty friendly title.
             title_tag = child.find("{http://purl.org/dc/elements/1.1/}title")
             if(title_tag is not None):
-                #title = title_tag.text.encode("utf-8")
                 title = title_tag.text
             #END IF
 
             # Authors can be either single names under creator or multiple names in a list of
             # contributors.
             creator = child.find("{http://purl.org/dc/elements/1.1/}creator")
-            if (creator == None):
-               contributors = child.findall("{http://purl.org/dc/elements/1.1/}contributor/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}Bag/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}li")
-               for contributor in contributors:
-                   #author.append(contributor.text.encode("utf-8"))
-                   author.append(contributor.text)
-            else:
-                #author.append(creator.text.encode("utf-8"))
+            contributors = child.findall("{http://purl.org/dc/elements/1.1/}contributor/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}Bag/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}li")
+            for contributor in contributors:
+                author.append(contributor.text)
+
+            if (creator != None):
                 author.append(creator.text)
             #End if
 
