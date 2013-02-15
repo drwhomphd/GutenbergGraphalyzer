@@ -116,7 +116,7 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             #publisher =  publisher_name.text.encode("utf-8")
             publisher =  publisher_name.text
 
-            downloads = child.find("{http://www.gutenberg.org/rdfterms/}downloads/{http://www.w3.org/2001/XMLSchema#}nonNegativeInteger/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value").text.encode("utf-8")
+            downloads = child.find("{http://www.gutenberg.org/rdfterms/}downloads/{http://www.w3.org/2001/XMLSchema#}nonNegativeInteger/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value").text
 
 
             # The full path for the LCSH elements is actually:
@@ -151,7 +151,7 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
                 # requirements. Must always be add_ebook_to_db first.
                 add_ebook_to_db(db_conn, etextID, title, publisher, copyright, downloads, filename)
                 add_author_to_db(db_conn, etextID, author)
-                add_subject_to_db(db_conn, etextID, subjects)
+                add_subject_to_db(db_conn, etextID, lccsubjects, lcshsubjects)
             #END IF
         else:
             print(("Unparsed tag: %s" % child.tag))
@@ -271,22 +271,38 @@ def add_author_to_db(dbc, ebookID, author_list):
 The subject is added to subjectdetails, if it does not already exist,
 and booksubjects at the same time to conserve space. 
 """
-def add_subject_to_db(dbc, ebookID, subject_list):
+def add_subject_to_db(dbc, ebookID, lccsubject_list, lcshsubject_list):
 
-    for subject in subject_list:
+    for subject in lccsubject_list:
 
         # Need to obtain the subject ID if it exists.
-        r = dbc.execute("SELECT subjectID FROM subjectdetails WHERE subject=?", (subject,))
+        r = dbc.execute("SELECT subjectID FROM lccsubjects WHERE subject=?", (subject,))
         id = r.fetchone()
         
         if (id is None):
             # If it doesn't exist we need to Insert the subject, get its id, then add it to the booksubjects
-            dbc.execute("INSERT INTO subjectdetails(subject) VALUES (?)", (subject,))
-            r = dbc.execute("SELECT subjectID FROM subjectdetails WHERE subject=?", (subject,))
+            dbc.execute("INSERT INTO lccsubjects(subject) VALUES (?)", (subject,))
+            r = dbc.execute("SELECT subjectID FROM lccsubjects WHERE subject=?", (subject,))
             id = r.fetchone()
         # END IF
         
-        dbc.execute("INSERT INTO booksubjects VALUES(?,?)", (ebookID, id[0],))
+        dbc.execute("INSERT INTO lccmap VALUES(?,?)", (ebookID, id[0],))
+    #END FOR
+    
+    for subject in lcshsubject_list:
+
+        # Need to obtain the subject ID if it exists.
+        r = dbc.execute("SELECT subjectID FROM lcshsubjects WHERE subject=?", (subject,))
+        id = r.fetchone()
+        
+        if (id is None):
+            # If it doesn't exist we need to Insert the subject, get its id, then add it to the booksubjects
+            dbc.execute("INSERT INTO lcshsubjects(subject) VALUES (?)", (subject,))
+            r = dbc.execute("SELECT subjectID FROM lcshsubjects WHERE subject=?", (subject,))
+            id = r.fetchone()
+        # END IF
+        
+        dbc.execute("INSERT INTO lcshmap VALUES(?,?)", (ebookID, id[0],))
     #END FOR
 
 #END FUNCTION
