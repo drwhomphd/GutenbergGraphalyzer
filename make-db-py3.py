@@ -75,7 +75,8 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             etextID = ""
             title = ""
             author = []
-            subjects = []
+            lccsubjects = []
+            lcshsubjects = []
             publisher = ""
             downloads = ""
             copyright = ""
@@ -125,10 +126,10 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
             #          {http://purl.org/dc/terms/}LCSH
             for subject in child.findall(".//{http://purl.org/dc/terms/}LCSH/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value"):
                 #subjects.append(subject.text.encode("utf-8"))
-                subjects.append(subject.text)
+                lcshsubjects.append(subject.text)
             for subject in child.findall(".//{http://purl.org/dc/terms/}LCC/{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value"):
                 #subjects.append(subject.text.encode("utf-8"))
-                subjects.append(subject.text)
+                lccsubjects.append(subject.text)
 
             # Print out information if we're debugging otherwise we add it to the database
             if(debug == True):
@@ -139,7 +140,9 @@ def parse_catalog_rdf(tree_root, ebook_list, debug=False):
                 for name in author:
                     print(name)
                 print(publisher)
-                for subject in subjects:
+                for subject in lcshsubjects:
+                    print(subject)
+                for subject in lccsubjects:
                     print(subject)
                 print("---------------")
             else:
