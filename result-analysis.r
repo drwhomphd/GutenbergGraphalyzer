@@ -1,4 +1,5 @@
 library(RSQLite)
+library(ggplot2)
 
 con <- dbConnect("SQLite", dbname = "results/catalog.db")
 
@@ -14,4 +15,21 @@ dbListTables(con)
 tbl = dbGetQuery(con, "SELECT * FROM experiments")
 print(names(tbl))
 
+avgs = c()
+sds = c()
+
+for(e in seq(1500, 1980, 5)){
+  qry = sprintf("SELECT * FROM experiments exp, authordetails ad, bookauthors ab, ebooks eb WHERE ad.authorID = ab.authorID AND ab.etextID = eb.etextID AND CAST(ad.birth AS INTEGER) >= %d AND CAST(ad.birth AS INTEGER) < %d AND exp.etextID = ab.etextID", e, e+10)
+  tbl = dbGetQuery(con, qry)
+  avgs = c(avgs, mean(tbl$da))
+  sds = c(sds, sd(tbl$da))
+}
+
+plot(avgs~seq(1500, 1980, 5), type="l")
+
+
+tbl = dbGetQuery(con, "SELECT * FROM experiments exp, authordetails ad, bookauthors ab, ebooks eb WHERE ad.authorID = ab.authorID AND ab.etextID = eb.etextID AND CAST(ad.birth AS INTEGER) >= 1820 AND CAST(ad.birth AS INTEGER) < 1830 AND exp.etextID = ab.etextID")
+
 #pairs(tbl)
+
+
