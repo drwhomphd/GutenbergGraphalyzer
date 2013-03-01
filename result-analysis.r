@@ -66,6 +66,8 @@ sdda = c()
 sdaec = c()
 sdnec = c()
 
+counts = c()
+
 for(e in seq(1500, 1971, 10)){
   qry = sprintf("SELECT DISTINCT(ab.etextID), exp.* FROM experiments exp, authordetails ad, bookauthors ab, ebooks eb WHERE ad.authorID = ab.authorID AND ab.etextID = eb.etextID AND CAST(ad.birth AS INTEGER) >= %d AND CAST(ad.birth AS INTEGER) < %d AND exp.etextID = ab.etextID", e, e+10)
   tbl = dbGetQuery(con, qry)
@@ -84,7 +86,16 @@ for(e in seq(1500, 1971, 10)){
 
   avgnec = c(avgnec, mean(tbl$nec))
   sdnec = c(sdnec, sd(tbl$nec))
+  
+  qry = sprintf("SELECT COUNT(DISTINCT(ab.etextID)), exp.* FROM experiments exp, authordetails ad, bookauthors ab, ebooks eb WHERE ad.authorID = ab.authorID AND ab.etextID = eb.etextID AND CAST(ad.birth AS INTEGER) >= %d AND CAST(ad.birth AS INTEGER) < %d AND exp.etextID = ab.etextID", e, e+10)
+  
+  tbl2 = dbGetQuery(con, qry)
+  counts = c(counts, tbl2[,1])
 }
+
+# Re-Plot Info Complexity and counts
+plot(counts~seq(1500, 1971, 10), type="l", xlab="Author Birth Year", ylab="Ebook Count", main = "Ebook Count Per Author Birth Decade (AD)")
+
 plot(avgsi~seq(1500,1971, 10), type="l", xlab="Author Birth Decade(AD)", ylab="Bits", main = "Complexity of Literature", ylim=c(0, max(avgsi)))
 lines(seq(1500,1971, 10), avgivd, col="red")
 legend("topright", legend = c("sinorm", "ivdnorm"), col = c("black", "red"), lty = c(1, 1))
