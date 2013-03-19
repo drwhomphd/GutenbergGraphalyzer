@@ -112,6 +112,41 @@ legend("topright", legend = c("NEC"), col = c("black"), lty = c(1, 1))
 plot(avgda~seq(1500,1971, 10), type="l", xlab="Author Birth Decade(AD)", main = "Complexity of Literature")
 legend("top", legend = c("DA"), col = c("black"), lty = c(1, 1))
 
+# Create a pair of box plots comparing an author against all those who lived within the same period of the author.
+# Previous queries were done to get author ids
+# ID 674 = James Joyce
+# ID 1962 = Gertrude Stein
+# ID 6490 = Virginia Woolf
+# ID 176 = Samuel Richardson
+
+authors = c(674, 1962, 6490, 176)
+for ( i in seq(1, length(authors))) {
+
+  print(sprintf("Author %d\n", authors[i]))
+  
+  # Get information for the author
+  
+  qry = sprintf("SELECT exp.*, ad.* FROM experiments exp, authordetails ad, bookauthors ab, ebooks eb WHERE eb.etextID = ab.etextID AND ab.authorID = ad.authorID AND ad.authorID = %d AND exp.etextID = eb.etextID", authors[i])
+  
+  authortbl = dbGetQuery(con, qry)
+
+  authorbirth = as.integer(authortbl$birth[1])
+  authordeath = as.integer(authortbl$death[1])
+  authorlast = authortbl$last[1]
+  authorfirst = authortbl$first[1]
+
+
+  # Get the information for all books not by the author during their time period
+  qry = sprintf("SELECT exp.*, ad.* FROM experiments exp, authordetails ad, bookauthors ba, ebooks eb WHERE eb.etextID = ba.etextID AND ba.authorID = ad.authorID AND ad.authorID != %d AND ad.birth NOT NULL AND ad.death NOT NULL AND CAST (ad.birth AS INTEGER) >= %d AND CAST(ad.death AS INTEGER) <= %d AND CAST(ad.death AS INTEGER) > 0", authors[i], authorbirth, authordeath)
+  periodtbl = dbGetQuery(con, qry)
+
+  boxplot(authortbl$ivdnorm, periodtbl$ivdnorm, names = c(authorlast, "General"))
+  title(sprintf("Complexity of %s %s Compared to Others", authorfirst, authorlast))
+
+}
+
+
+
 #tbl = dbGetQuery(con, "SELECT * FROM experiments exp, authordetails ad, bookauthors ab, ebooks eb WHERE ad.authorID = ab.authorID AND ab.etextID = eb.etextID AND CAST(ad.birth AS INTEGER) >= 1820 AND CAST(ad.birth AS INTEGER) < 1830 AND exp.etextID = ab.etextID")
 
 #pairs(tbl)
