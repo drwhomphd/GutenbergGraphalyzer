@@ -13,6 +13,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with Gutenberg Graphalyzer.  If not, see <http://www.gnu.org/licenses/>.
+
+NOTE: There's currently a bug where if authors have the exact same first and last name, they won't be added as seperate author's to the database. Birth and death dates should be checked as well.
 """
 import xml.etree.cElementTree as ET
 import sqlite3
