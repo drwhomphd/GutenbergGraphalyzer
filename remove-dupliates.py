@@ -1,6 +1,20 @@
 #!/usr/bin/python
 
-"""
+""" 
+*     This file is part of Gutenberg Graphalyzer
+*     Gutenberg Graphalyzer is free software: you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation, either version 3 of the License, or
+*     (at your option) any later version.
+*
+*     Gutenberg Graphalyzer is distributed in the hope that it will be useful,
+*     but WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*     GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with Gutenberg Graphalyzer.  If not, see <http://www.gnu.org/licenses/>.
+
 This script removes any duplicate etexts from a gutenberg repository. ASCII files delete ISO and UTF8 files. ISO files delete UTF8 files. UTF8 does
 nothing. Execute from the directory where the text files are stored.
 
